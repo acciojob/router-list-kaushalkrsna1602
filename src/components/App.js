@@ -1,29 +1,38 @@
-
-import React from "react";
-import './../styles/App.css';
-import { BrowserRouter, Route, Routes, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import "./../styles/App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import UserDetails from "./UserDetails";
+import Users from "./Users";
 
 const App = () => {
-  return (
-    <BrowserRouter>
-      <div>
-        {/* Do not remove the main div */}
-        <Routes>
-          <Route path="/" element={<div>
-            <h1>Item List</h1>
-            <ul>
-              <li><Link to={"/items/1"} >Item 1</Link> </li>
-              <li><Link to={"/items/2"} >Item 2</Link> </li>
-              <li><Link to={"/items/3"} >Item 3</Link> </li>
-            </ul>
-          </div>} />
-          <Route path="/items/1" element={<div><h1>Item 1</h1><p>Description for Item 1</p></div>} />
-          <Route path="/items/2" element={<div><h1>Item 2</h1><p>Description for Item 2</p></div>} />
-          <Route path="/items/3" element={<div><h1>Item 3</h1><p>Description for Item 3</p></div>} />
-        </Routes>
-      </div>
-    </BrowserRouter>
-  )
-}
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-export default App
+  // Fetch data when the component mounts for the first time
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((resp) => resp.json())
+      .then((data) => {
+        setUsers(data);
+        setLoading(false);
+      });
+  }, []);
+
+  return (
+    <div>
+      {/* Do not remove the main div */}
+      <Router>
+        {loading ? (
+          <h1>Loading...</h1>
+        ) : (
+          <Routes>
+            <Route path="/" element={<UserDetails users={users} />} />
+            <Route path="/users/:id" element={<Users users={users} />} />
+          </Routes>
+        )}
+      </Router>
+    </div>
+  );
+};
+
+export default App;
